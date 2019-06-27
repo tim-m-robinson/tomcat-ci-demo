@@ -25,6 +25,10 @@ node {
           sh 'mvn -B compile'
         }
 
+        stage('Package') {
+          sh 'mvn -B package'
+        }
+
         stage('Containerise') {
           sh "git rev-parse HEAD > build.id"
           sh 'mvn -B docker:build'
