@@ -1,7 +1,7 @@
 node {
     stage('Prep') {
         deleteDir()
-        scm checkout
+        checkout scm
 
         // set BUILD_TIMESTAMP
         def now = new Date()
