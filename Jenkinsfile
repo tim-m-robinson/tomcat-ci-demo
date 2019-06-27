@@ -27,7 +27,7 @@ node {
 
         stage('Containerise') {
           sh "git rev-parse HEAD > build.id"
-          sh 'mvn -B dockerfile:build dockerfile:tag'
+          sh 'mvn -B fabric8:build'
         }
 
 	    stage('Integration Test') {
