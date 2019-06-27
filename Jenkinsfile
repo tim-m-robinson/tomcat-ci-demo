@@ -25,10 +25,6 @@ node {
           sh 'mvn -B compile'
         }
 
-        stage('Dependency Check') {
-          sh 'mvn -B org.owasp:dependency-check-maven:4.0.2:check'
-        }
-
         stage('Containerise') {
           sh "git rev-parse HEAD > build.id"
           sh 'mvn -B dockerfile:build dockerfile:tag'
