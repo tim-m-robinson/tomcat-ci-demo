@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://jboss.org/schema/arquillian"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian
+    http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+
+    <extension qualifier="docker">
+        <property name="definitionFormat">CUBE</property>
+        <property name="dockerInsideDockerResolution">true</property>
+        <property name="dockerContainers">
+          test*:
+            buildImage:
+              dockerfileLocation: .
+              noCache: true
+              remove: true
+            await:
+              strategy: polling
+            portBindings: [8080/tcp]
+            restartPolicy:
+              name: failure
+              maximumRetryCount: 1
+            manual: false
+        </property>
+    </extension>
+
+    <extension qualifier="drone">
+        <property name="instantiationTimeoutInSeconds">240</property>
+    </extension>
+
+    <extension qualifier="webdriver">
+        <property name="browser">chrome</property>
+    </extension>
+   <!--
+    <extension qualifier="webdriver-firefox">
+        <property name="browser">firefox</property>
+    </extension>
+    -->
+
+</arquillian>

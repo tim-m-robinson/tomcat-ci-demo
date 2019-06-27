@@ -16,39 +16,87 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <!-- core Arquillian versions -->
-    <arquillian.universe.version>1.2.0.1</arquillian.universe.version>
-    <arquillian.cube.version>1.17.1</arquillian.cube.version>
-    <arquillian.core.version>1.4.0.Final</arquillian.core.version>
-    <shrinkwrap.core.version>1.2.6</shrinkwrap.core.version>
-    <!-- core Docker Java version -->
-    <docker.java.version>3.0.14</docker.java.version>
+    <arquillian.bom.version>1.4.1.Final</arquillian.bom.version>
+    <arquillian.drone.version>2.0.0.Final</arquillian.drone.version>
+    <arquillian.cube.version>1.18.2</arquillian.cube.version>
+    <!-- selenium version -->
+    <selenium.version>2.53.1</selenium.version>
     <!-- fabric Docker builder version -->
-    <fabric8.mdp.version>0.26.1</fabric8.mdp.version>
+    <fabric8.mdp.version>0.30.0</fabric8.mdp.version>
   </properties>
- <!--
+
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId></groupId>
-        <artifactId></artifactId>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${arquillian.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian.extension</groupId>
+        <artifactId>arquillian-drone-bom</artifactId>
+        <version>${arquillian.drone.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian.selenium</groupId>
+        <artifactId>selenium-bom</artifactId>
+        <version>${selenium.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
-  -->
 
   <dependencies>
+    <!--  Use standalone mode in Arquillian (no @Deployment) -->
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Cube dependencies -->
+    <dependency>
+      <groupId>org.arquillian.cube</groupId>
+      <artifactId>arquillian-cube-docker</artifactId>
+      <version>${arquillian.cube.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.arquillian.cube</groupId>
+      <artifactId>arquillian-cube-docker-drone</artifactId>
+      <version>${arquillian.cube.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.extension</groupId>
+      <artifactId>arquillian-drone-webdriver-depchain</artifactId>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>3.9.0</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.26</version>
       <scope>test</scope>
     </dependency>
+    <!-- dirty hack to suppress Jersey 'HK2 service reification failed' errors in test logs -->
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -70,10 +118,24 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.1</version>
+          <configuration>
+            <excludes>
+              <exclude>**/*UITest</exclude>
+            </excludes>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-war-plugin</artifactId>
           <version>3.2.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.22.1</version>
+          <configuration>
+            <includes>
+              <include>**/*UITest</include>
+            </includes>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -105,4 +167,30 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.22.0</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
